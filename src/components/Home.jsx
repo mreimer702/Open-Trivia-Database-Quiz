@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Question from './Question';
+import Results from './Results';
 
 function Home() {
   const [formData, setFormData] = useState({
@@ -7,114 +8,139 @@ function Home() {
     category: '',
     difficulty: '',
   });
+
+  const [questionData, setQuestionData] = useState({
+    question: '',
+    correctAnswer: '',
+    incorrectAnswers: [],
+  });
+
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [questionData, setQuestionData] = useState(null); 
-
-  const categories = [
-    { id: 21, name: 'Sports' },
-    { id: 22, name: 'Geography' },
-    { id: 23, name: 'History' },
-    { id: 24, name: 'Politics' }
-  ];
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const validateForm = () => {
-    if (!formData.name.trim() || !formData.category || !formData.difficulty) {
-      setError('Please fill in all fields before submitting.');
-      return false;
-    }
-    setError('');
-    return true;
-  };
+  const [selectedAnswer, setSelectedAnswer] = useState('');
 
   const fetchQuestion = async () => {
+    if (!formData.category || !formData.difficulty || !formData.name.trim()) {
+      setError('Please fill in all fields before getting a question.');
+      return;
+    }
+
     try {
+      setError(''); 
+
       const response = await fetch(
         `https://opentdb.com/api.php?amount=1&category=${formData.category}&difficulty=${formData.difficulty}&type=multiple`
       );
 
       if (!response.ok) {
-        throw new Error('Failed to retrieve data');
+        throw new Error('Failed to fetch a question');
       }
 
       const data = await response.json();
-      const question = data.results[0];
+      const newQuestion = data.results[0];
 
       setQuestionData({
-        question: question.question,
-        correctAnswer: question.correct_answer,
-        incorrectAnswers: question.incorrect_answers,
+        question: newQuestion.question,
+        correctAnswer: newQuestion.correct_answer,
+        incorrectAnswers: newQuestion.incorrect_answers,
       });
-
-      setSuccess('Question retrieved! Answer below.');
-    } catch (e) {
-      setError(e.message);
+    } catch (error) {
+      setError(`❌ ${error.message}`);
+      setQuestionData({
+        question: '',
+        correctAnswer: '',
+        incorrectAnswers: [],
+      });
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-    if (!validateForm()) return;
+  const handleAnswerSubmit = (answer) => {
+    setSelectedAnswer(answer);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
     fetchQuestion();
   };
 
   return (
     <div>
       <h1>Open Trivia Database Quiz</h1>
-      <h2>Welcome! Enter your name, choose a category, and select a difficulty level to get a trivia question.</h2>
-      
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleFormSubmit}>
         <div>
-          <label htmlFor="name">First Name:</label><br />
+          <label htmlFor="name">Name:</label>
           <input
             type="text"
             id="name"
             name="name"
             value={formData.name}
-            onChange={handleChange}
+            onChange={handleInputChange}
             placeholder="Enter your name"
           />
         </div>
-
         <div>
           <label htmlFor="category">Choose a category:</label>
-          <select id="category" name="category" value={formData.category} onChange={handleChange}>
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
+          <select
+            name="category"
+            id="category"
+            value={formData.category}
+            onChange={handleInputChange}
+          >
+            <option value="">Select a category</option>
+            <option value="21">Sports</option>
+            <option value="22">Geography</option>
+            <option value="23">History</option>
+            <option value="24">Politics</option>
           </select>
         </div>
-
         <div>
-          <label htmlFor="difficulty">Choose difficulty:</label>
-          <select id="difficulty" name="difficulty" value={formData.difficulty} onChange={handleChange}>
-            <option value="">Select Difficulty</option>
+          <label htmlFor="difficulty">Choose the difficulty:</label>
+          <select
+            name="difficulty"
+            id="difficulty"
+            value={formData.difficulty}
+            onChange={handleInputChange}
+          >
+            <option value="">Select difficulty</option>
             <option value="easy">Easy</option>
             <option value="medium">Medium</option>
             <option value="hard">Hard</option>
           </select>
         </div>
-
         <button type="submit">Get Question</button>
       </form>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
-      {success && <div style={{ color: 'green' }}>{success}</div>}
-      {questionData && <Question {...questionData} />}
+
+      {questionData.question && (
+        <Question
+          question={questionData.question}
+          correctAnswer={questionData.correctAnswer}
+          incorrectAnswers={questionData.incorrectAnswers}
+          onAnswerSubmit={handleAnswerSubmit}
+        />
+      )}
+
+      {selectedAnswer && questionData.correctAnswer && (
+        <Results
+        correctAnswer={questionData.correctAnswer}
+        userAnswer={selectedAnswer}
+        setQuestionData={setQuestionData}
+        name={formData.name}
+      />
+      
+      )}
     </div>
   );
 }
 
 export default Home;
-
 
 

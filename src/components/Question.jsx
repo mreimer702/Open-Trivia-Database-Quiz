@@ -1,41 +1,28 @@
 import { useState } from 'react';
 
-function Question({ question, correctAnswer, incorrectAnswers }) {
-    if (!question) return null;
-  const [answerInput, setAnswerInput] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+function Question({ question, correctAnswer, incorrectAnswers, onAnswerSubmit }) {
+  if (!question) return null;
 
-  const answers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5); // Shuffle answers
+  const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleChange = (event) => {
-    setAnswerInput(event.target.value);
-  };
-
-  const validateForm = () => {
-    if (!answerInput) {
-      setError('Please select an answer before submitting.');
-      return false;
-    }
-    setError('');
-    return true;
-  };
+  const answers = [...incorrectAnswers, correctAnswer].sort(() => Math.random() - 0.5);
 
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!validateForm()) return;
-
-    if (answerInput === correctAnswer) {
-      setSuccess('✅ Correct answer! 🎉');
-    } else {
-      setError('❌ Wrong answer. Try again!');
+    if (!selectedAnswer) {
+      setMessage('Please select an answer before submitting.');
+      return;
     }
+
+    onAnswerSubmit(selectedAnswer); 
+    setMessage('');
   };
 
   return (
     <div>
-      <h3 dangerouslySetInnerHTML={{ __html: question }}/>
+      <h3 dangerouslySetInnerHTML={{ __html: question }} />
       <form onSubmit={handleSubmit}>
         {answers.map((answer, index) => (
           <div key={index}>
@@ -44,18 +31,17 @@ function Question({ question, correctAnswer, incorrectAnswers }) {
               id={`answer-${index}`}
               name="answer"
               value={answer}
-              onChange={handleChange}
+              onChange={(e) => setSelectedAnswer(e.target.value)}
             />
             <label htmlFor={`answer-${index}`} dangerouslySetInnerHTML={{ __html: answer }} />
           </div>
         ))}
         <button type="submit">Submit Your Answer</button>
       </form>
-
-      {error && <div style={{ color: 'red' }}>{error}</div>}
-      {success && <div style={{ color: 'green' }}>{success}</div>}
+      {message && <div style={{ color: 'red' }}>{message}</div>} 
     </div>
   );
 }
 
 export default Question;
+
