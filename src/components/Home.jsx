@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Question from './Question';
 
 function Home() {
   const [formData, setFormData] = useState({
     name: '',
     category: '',
-    difficulty: ''
+    difficulty: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [questionData, setQuestionData] = useState(null); 
 
   const categories = [
     { id: 21, name: 'Sports' },
@@ -30,14 +32,10 @@ function Home() {
     return true;
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!validateForm()) return;
-
+  const fetchQuestion = async () => {
     try {
       const response = await fetch(
-        `https://opentdb.com/api.php?amount=10&category=${formData.category}&difficulty=${formData.difficulty}&type=multiple`
+        `https://opentdb.com/api.php?amount=1&category=${formData.category}&difficulty=${formData.difficulty}&type=multiple`
       );
 
       if (!response.ok) {
@@ -45,19 +43,31 @@ function Home() {
       }
 
       const data = await response.json();
-      setSuccess('Form submitted successfully! Check console for quiz data.');
-      console.log(data);
+      const question = data.results[0];
 
-      setFormData({ name: '', category: '', difficulty: '' });
+      setQuestionData({
+        question: question.question,
+        correctAnswer: question.correct_answer,
+        incorrectAnswers: question.incorrect_answers,
+      });
+
+      setSuccess('Question retrieved! Answer below.');
     } catch (e) {
       setError(e.message);
     }
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!validateForm()) return;
+    fetchQuestion();
+  };
+
   return (
     <div>
       <h1>Open Trivia Database Quiz</h1>
-      <p>Welcome! Please enter your name, choose a category, and select a difficulty level to generate trivia questions.</p>
+      <h2>Welcome! Enter your name, choose a category, and select a difficulty level to get a trivia question.</h2>
       
       <form onSubmit={handleSubmit}>
         <div>
@@ -94,15 +104,17 @@ function Home() {
           </select>
         </div>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Get Question</button>
       </form>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
       {success && <div style={{ color: 'green' }}>{success}</div>}
+      {questionData && <Question {...questionData} />}
     </div>
   );
 }
 
 export default Home;
+
 
 
