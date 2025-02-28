@@ -1,12 +1,63 @@
-# React + Vite
+# Trivia Quiz App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a simple trivia quiz application built using React. It fetches questions from the Open Trivia Database API and allows users to test their knowledge in various categories and difficulty levels.
 
-Currently, two official plugins are available:
+## Features
+- Users can enter their name before starting the quiz.
+- Choose from multiple categories (Sports, Geography, History, Politics).
+- Select difficulty level (Easy, Medium, Hard).
+- Fetches a random question from OpenTDB API.
+- Displays multiple-choice answers.
+- Provides feedback on whether the selected answer is correct or incorrect.
+- Option to reset the quiz and fetch a new question.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Technologies Used
+- React.js
+- Open Trivia Database API (https://opentdb.com/)
+- CSS for styling
 
-## Expanding the ESLint configuration
+## Installation & Setup
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/yourusername/trivia-quiz-app.git
+   ```
+2. Navigate to the project directory:
+   ```sh
+   cd trivia-quiz-app
+   ```
+3. Install dependencies:
+   ```sh
+   npm install
+   ```
+4. Start the development server:
+   ```sh
+   npm run dev
+   ```
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Project Structure
+```
+trivia-quiz-app/
+│── src/
+│   ├── components/
+│   │   ├── Home.jsx
+│   │   ├── Question.jsx
+│   │   ├── Results.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│── public/
+│── styles.css
+│── README.md
+│── package.json
+│── vite.config.js
+```
+
+## API Usage
+This app uses the Open Trivia Database API to fetch quiz questions. API request example:
+```sh
+https://opentdb.com/api.php?amount=1&category={CATEGORY}&difficulty={DIFFICULTY}&type=multiple
+```
+
+## Future Enhancements
+- Add more categories dynamically from API.
+- Implement a scoreboard to track correct answers.
+- Enhance UI with animations and better styling.
