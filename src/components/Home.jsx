@@ -73,6 +73,7 @@ function Home() {
   return (
     <div>
       <h1>Open Trivia Database Quiz</h1>
+      <h2>Enter your name, pick a category and difficulty level and start answering some trivia questions.</h2>
       <form onSubmit={handleFormSubmit}>
         <div>
           <label htmlFor="name">Name:</label>
@@ -137,6 +138,11 @@ function Home() {
       />
       
       )}
+      <footer class="footer">
+      <p>&copy; Martin Reimer 2025</p>
+      <p>All data used in this website is from the <a href="https://opentdb.com/">Open Trivia Database API</a></p>
+      <p>The icon image is from this <a href="https://media.istockphoto.com/id/1396725757/vector/did-you-know-circle-message-bubble-with-light-bulb-emblem-banner-design-for-business-and.jpg?s=612x612&w=0&k=20&c=3K4fE6lfnxdW9c0LtrUFJ_eLHQ1XZkHCXV0NhrzGiK0=">link</a></p>
+    </footer>
     </div>
   );
 }
